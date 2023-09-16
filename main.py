@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 import requests
-from bs4 import BeautifulSoup
 from lxml import html
 import re
 
