@@ -20,7 +20,6 @@ def get_market_price(item_id):
 
     response = requests.post(url, headers=headers, json=data)
 
-    # If you want to get the response as a JSON object, you can do:
     response_data = response.json()
     if 'resultMsg' in response_data:
         result_message = response_data['resultMsg']
@@ -40,7 +39,7 @@ def get_vendor_price(item_id):
     response = requests.get(url)
     html_content = response.text
     tree = html.fromstring(html_content)
-    xpath_query_vendor = '//td[@colspan="2"]'  # This is just a placeholder; use your actual XPath
+    xpath_query_vendor = '//td[@colspan="2"]'
     results_vendor = tree.xpath(xpath_query_vendor)
 
     for result_vendor in results_vendor:
