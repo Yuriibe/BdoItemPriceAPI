@@ -1,11 +1,7 @@
-from flask import Flask, jsonify
 import requests
-from bs4 import BeautifulSoup
 from lxml import html
 import re
 
-app = Flask(__name__)
-item_id = '44195'
 def get_market_price(item_id):
     url = "https://eu-trade.naeu.playblackdesert.com/Trademarket/GetMarketPriceInfo"
     headers = {
@@ -26,16 +22,14 @@ def get_market_price(item_id):
         entries = result_message.split('-')
         if len(entries) > 3:
             last_entry = entries[-1]  # Get the last entry
-            print(f"The last entry of resultMsg is: {last_entry}")
             return last_entry
         else:
             return None
     else:
         return None
 
-
 def get_vendor_price(item_id):
-    url = 'https://bdocodex.com/us/item/' + item_id + '/'
+    url = 'https://bdocodex.com/us/item/' + str(item_id) + '/'
     response = requests.get(url)
     html_content = response.text
     tree = html.fromstring(html_content)
@@ -49,24 +43,20 @@ def get_vendor_price(item_id):
         if match:
             sell_price = match.group(1)
             sell_price = sell_price.replace(",","")
-            print(f"Sell price: {sell_price}")
             return sell_price
         else:
-            print("Sell price not found!")
-            return None
+            return 1
+
+def get_item_name(item_id):
+    url = 'https://bdocodex.com/us/item/' + str(item_id) + '/'
+    response = requests.get(url)
+    html_content = response.text
+    tree = html.fromstring(html_content)
+    xpath_query_item_name = '/html/body/div/div[1]/div[3]/div[1]/div[1]/div[1]/b'
+    results_item_name = tree.xpath(xpath_query_item_name)
+    for result_item_name in results_item_name:
+        text_from_result = result_item_name.text_content()
+        return text_from_result
 
 
-@app.route('/getItemPrice', methods=['GET'])
-def get_data():
-    print(item_id)
-    print(get_market_price(item_id))
-    if get_market_price(item_id) is not None:
-        price = get_market_price(item_id)
-    else:
-        price = get_vendor_price(item_id)
 
-    return jsonify(price)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
